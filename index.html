@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UTM Builder - Neil Fox Agency</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
+        input, select, button { padding: 10px; margin: 5px; width: 100%; box-sizing: border-box; }
+        button { background: #0070f3; color: white; border: none; cursor: pointer; }
+        .result { background: #f0f0f0; padding: 15px; margin-top: 20px; word-break: break-all; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>UTM Builder</h1>
+    <p>Privacy-first UTM link builder for creator campaigns and small business marketing. All processing happens in your browser.</p>
+    
+    <form id="utmForm">
+        <label for="baseUrl">Base URL (required)</label>
+        <input type="url" id="baseUrl" placeholder="https://yourbrand.com/page" required>
+        
+        <label for="utmSource">utm_source (e.g., youtube, instagram, newsletter)</label>
+        <input type="text" id="utmSource" placeholder="youtube">
+        
+        <label for="utmMedium">utm_medium (e.g., creator, social, email)</label>
+        <input type="text" id="utmMedium" placeholder="creator">
+        
+        <label for="utmCampaign">utm_campaign (e.g., summer-collab-2026)</label>
+        <input type="text" id="utmCampaign" placeholder="summer-collab-2026">
+        
+        <label for="utmTerm">utm_term (optional, e.g., keyword or creator name)</label>
+        <input type="text" id="utmTerm" placeholder="neil-fox">
+        
+        <label for="utmContent">utm_content (optional, e.g., video1 or discount-code)</label>
+        <input type="text" id="utmContent" placeholder="video1">
+        
+        <button type="submit">Generate UTM Link</button>
+    </form>
+    
+    <div id="result" class="result" style="display: none;">
+        <h2>Generated Link</h2>
+        <p id="generatedUrl"></p>
+        <button onclick="copyToClipboard()">Copy to Clipboard</button>
+    </div>
+
+    <script>
+        function buildUTM() {
+            const baseUrl = document.getElementById('baseUrl').value.trim();
+            if (!baseUrl) return;
+
+            let url = new URL(baseUrl);
+            const params = new URLSearchParams(url.search);
+
+            const source = document.getElementById('utmSource').value.trim();
+            const medium = document.getElementById('utmMedium').value.trim();
+            const campaign = document.getElementById('utmCampaign').value.trim();
+            const term = document.getElementById('utmTerm').value.trim();
+            const content = document.getElementById('utmContent').value.trim();
+
+            if (source) params.set('utm_source', source);
+            if (medium) params.set('utm_medium', medium);
+            if (campaign) params.set('utm_campaign', campaign);
+            if (term) params.set('utm_term', term);
+            if (content) params.set('utm_content', content);
+
+            url.search = params.toString();
+            return url.toString();
+        }
+
+        document.getElementById('utmForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const link = buildUTM();
+            if (link) {
+                document.getElementById('generatedUrl').textContent = link;
+                document.getElementById('result').style.display = 'block';
+            }
+        });
+
+        function copyToClipboard() {
+            const urlText = document.getElementById('generatedUrl').textContent;
+            navigator.clipboard.writeText(urlText).then(() => {
+                alert('Link copied to clipboard!');
+            });
+        }
+
+        // Quick presets for creator campaigns
+        const presets = {
+            'youtube': {source: 'youtube', medium: 'social'},
+            'instagram': {source: 'instagram', medium: 'social'},
+            'creator': {source: 'creator', medium: 'partnership'}
+        };
+    </script>
+</body>
+</html>
