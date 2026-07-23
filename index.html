@@ -16,29 +16,38 @@
         .preset-btn:hover { background: #ddd; }
         .history { margin-top: 30px; }
         .history p { background: #fafafa; padding: 10px; border-radius: 4px; }
+        .tip { font-size: 0.9em; color: #666; margin-top: 5px; }
+        .naming { background: #e6f7ff; padding: 15px; border-radius: 6px; margin: 15px 0; font-size: 0.9em; border-left: 4px solid #0070f3; }
     </style>
 </head>
 <body>
     <h1>UTM Builder for Creator Campaigns</h1>
     <p>Privacy-first tool optimized for YouTube creator partnerships, outreach, discount codes, and attribution reporting. Built for Neil Fox Agency workflows. Client-side only.</p>
     
+    <div class="naming">
+        <strong>Best Practice Naming Conventions (auto-enforced):</strong><br>
+        • Lowercase only • Use underscores instead of spaces • No special characters<br>
+        Examples: youtube_creator_summer, john_doe_reel, promo_summer_discount
+    </div>
+
     <form id="utmForm">
         <label for="baseUrl">Base URL (e.g., landing page or product page)</label>
         <input type="url" id="baseUrl" placeholder="https://yourbrand.com/landing" required>
         
         <label for="utmSource">utm_source (e.g. youtube, creatorhandle, tiktok)</label>
-        <input type="text" id="utmSource" placeholder="youtube">
+        <input type="text" id="utmSource" placeholder="youtube" class="lowercase-input">
+        <span class="tip">Platform or creator handle</span>
         
-        <label for="utmMedium">utm_medium (e.g. creator, partnership, social)</label>
-        <input type="text" id="utmMedium" placeholder="creator">
+        <label for="utmMedium">utm_medium (e.g. creator, influencer, partnership, discount)</label>
+        <input type="text" id="utmMedium" placeholder="creator" class="lowercase-input">
         
         <label for="utmCampaign">utm_campaign (e.g. collab-summer-2026)</label>
-        <input type="text" id="utmCampaign" placeholder="collab-summer-2026">
+        <input type="text" id="utmCampaign" placeholder="collab-summer-2026" class="lowercase-input">
         
-        <label for="utmTerm">utm_term (optional: keyword or specific creator)</label>
-        <input type="text" id="utmTerm" placeholder="neil-fox">
+        <label for="utmTerm">utm_term (optional: keyword or audience segment)</label>
+        <input type="text" id="utmTerm" placeholder="fitness">
         
-        <label for="utmContent">utm_content (optional: video-id, discount-code, bio-link)</label>
+        <label for="utmContent">utm_content (optional: video-id, discount-code, bio-link, placement)</label>
         <input type="text" id="utmContent" placeholder="video-main">
         
         <button type="submit">Generate UTM Link</button>
@@ -49,13 +58,14 @@
         <button class="preset-btn" onclick="applyPreset('instagram')">📷 Instagram</button>
         <button class="preset-btn" onclick="applyPreset('discount')">💰 Discount Code</button>
         <button class="preset-btn" onclick="applyPreset('partnership')">🤝 Partnership</button>
+        <button class="preset-btn" onclick="applyPreset('influencer')">🌟 General Influencer</button>
     </div>
     
     <div id="result" class="result" style="display: none;">
         <h2>✅ Generated Link</h2>
         <p id="generatedUrl" style="font-family: monospace; background: white; padding: 10px; border-radius: 4px;"></p>
         <button onclick="copyToClipboard()">📋 Copy to Clipboard</button>
-        <button onclick="clearForm()" style="background: #666; margin-left: 10px;">New</button>
+        <button onclick="clearForm()" style="background: #666; margin-left: 10px;">New Link</button>
     </div>
 
     <div class="history" id="history"></div>
@@ -64,11 +74,16 @@
         let history = [];
 
         const presets = {
-            youtube: {source: 'youtube', medium: 'creator'},
-            instagram: {source: 'instagram', medium: 'social'},
-            discount: {source: 'promo', medium: 'discount', content: 'code'},
-            partnership: {source: 'creator', medium: 'partnership', campaign: 'collab-2026'}
+            youtube: {source: 'youtube', medium: 'creator', campaign: 'summer-collab-2026'},
+            instagram: {source: 'instagram', medium: 'social', campaign: 'summer-collab-2026'},
+            discount: {source: 'promo', medium: 'discount', content: 'summer-code-abc'},
+            partnership: {source: 'creator', medium: 'partnership', campaign: 'summer-collab-2026'},
+            influencer: {source: 'influencer', medium: 'influencer', campaign: 'q3-creator-seeding'}
         };
+
+        function sanitize(val) {
+            return (val || '').toLowerCase().trim().replace(/\s+/g, '_').replace(/[^a-z0-9_-]/g, '');
+        }
 
         function applyPreset(type) {
             const p = presets[type];
@@ -77,6 +92,7 @@
                 if (p.medium) document.getElementById('utmMedium').value = p.medium;
                 if (p.campaign) document.getElementById('utmCampaign').value = p.campaign;
                 if (p.content) document.getElementById('utmContent').value = p.content;
+                if (p.term) document.getElementById('utmTerm').value = p.term;
             }
         }
 
@@ -96,12 +112,14 @@
             const params = new URLSearchParams(url.search);
             const fields = ['source', 'medium', 'campaign', 'term', 'content'];
             fields.forEach(f => {
-                const val = document.getElementById('utm' + f.charAt(0).toUpperCase() + f.slice(1)).value.trim();
-                if (val) params.set('utm_' + f, val);
+                let val = document.getElementById('utm' + f.charAt(0).toUpperCase() + f.slice(1)).value.trim();
+                if (val) {
+                    val = sanitize(val);
+                    params.set('utm_' + f, val);
+                }
             });
             url.search = params.toString();
             const full = url.toString();
-            // History
             history.unshift({url: full, time: new Date().toLocaleString()});
             if (history.length > 10) history.pop();
             renderHistory();
@@ -112,7 +130,7 @@
             e.preventDefault();
             const link = buildUTM();
             if (link) {
-                document.getElementById('generatedUrl').innerHTML = `<a href="${link}" target="_blank">${link}</a>`;
+                document.getElementById('generatedUrl').innerHTML = `<a href="${link}" target="_blank" rel="noopener noreferrer">${link}</a>`;
                 document.getElementById('result').style.display = 'block';
             }
         });
@@ -120,13 +138,13 @@
         function copyToClipboard() {
             const text = document.getElementById('generatedUrl').textContent || document.getElementById('generatedUrl').innerText;
             navigator.clipboard.writeText(text).then(() => {
-                alert('✅ Link copied! Ready for your creator outreach or campaign docs.');
+                alert('✅ Link copied! Perfect for creator outreach, contracts, and reporting.');
             });
         }
 
         function renderHistory() {
             const div = document.getElementById('history');
-            div.innerHTML = `<h3>Recent UTM Links (last 10)</h3>` + history.map((h, i) => `<p><small>${h.time}</small><br><a href="${h.url}" target="_blank" style="color: #0070f3;">${h.url}</a></p>`).join('');
+            div.innerHTML = `<h3>Recent UTM Links (last 10) - Reuse for consistent tracking</h3>` + history.map((h, i) => `<p><small>${h.time}</small><br><a href="${h.url}" target="_blank" rel="noopener noreferrer" style="color: #0070f3;">${h.url}</a></p>`).join('');
         }
 
         function clearForm() {
@@ -134,9 +152,14 @@
             document.getElementById('result').style.display = 'none';
         }
 
-        // Demo data
+        document.querySelectorAll('.lowercase-input').forEach(input => {
+            input.addEventListener('blur', function() {
+                this.value = sanitize(this.value);
+            });
+        });
+
         window.onload = () => {
-            document.getElementById('baseUrl').value = 'https://example.com/shop';
+            document.getElementById('baseUrl').value = 'https://example.com/creator-landing';
         };
     </script>
 </body>
