@@ -5,90 +5,138 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UTM Builder - Neil Fox Agency</title>
     <style>
-        body { font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
-        input, select, button { padding: 10px; margin: 5px; width: 100%; box-sizing: border-box; }
-        button { background: #0070f3; color: white; border: none; cursor: pointer; }
-        .result { background: #f0f0f0; padding: 15px; margin-top: 20px; word-break: break-all; }
-        label { display: block; margin-top: 10px; font-weight: bold; }
+        body { font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.6; }
+        input, select, button { padding: 12px; margin: 8px 0; width: 100%; box-sizing: border-box; border: 1px solid #ddd; border-radius: 6px; }
+        button { background: #0070f3; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background: #0051cc; }
+        .result { background: #f0f0f0; padding: 20px; margin-top: 20px; border-radius: 8px; word-break: break-all; }
+        label { display: block; margin-top: 15px; font-weight: 600; }
+        .presets { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+        .preset-btn { padding: 8px 16px; background: #eee; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em; }
+        .preset-btn:hover { background: #ddd; }
+        .history { margin-top: 30px; }
+        .history p { background: #fafafa; padding: 10px; border-radius: 4px; }
     </style>
 </head>
 <body>
-    <h1>UTM Builder</h1>
-    <p>Privacy-first UTM link builder for creator campaigns and small business marketing. All processing happens in your browser.</p>
+    <h1>UTM Builder for Creator Campaigns</h1>
+    <p>Privacy-first tool optimized for YouTube creator partnerships, outreach, discount codes, and attribution reporting. Built for Neil Fox Agency workflows. Client-side only.</p>
     
     <form id="utmForm">
-        <label for="baseUrl">Base URL (required)</label>
-        <input type="url" id="baseUrl" placeholder="https://yourbrand.com/page" required>
+        <label for="baseUrl">Base URL (e.g., landing page or product page)</label>
+        <input type="url" id="baseUrl" placeholder="https://yourbrand.com/landing" required>
         
-        <label for="utmSource">utm_source (e.g., youtube, instagram, newsletter)</label>
+        <label for="utmSource">utm_source (e.g. youtube, creatorhandle, tiktok)</label>
         <input type="text" id="utmSource" placeholder="youtube">
         
-        <label for="utmMedium">utm_medium (e.g., creator, social, email)</label>
+        <label for="utmMedium">utm_medium (e.g. creator, partnership, social)</label>
         <input type="text" id="utmMedium" placeholder="creator">
         
-        <label for="utmCampaign">utm_campaign (e.g., summer-collab-2026)</label>
-        <input type="text" id="utmCampaign" placeholder="summer-collab-2026">
+        <label for="utmCampaign">utm_campaign (e.g. collab-summer-2026)</label>
+        <input type="text" id="utmCampaign" placeholder="collab-summer-2026">
         
-        <label for="utmTerm">utm_term (optional, e.g., keyword or creator name)</label>
+        <label for="utmTerm">utm_term (optional: keyword or specific creator)</label>
         <input type="text" id="utmTerm" placeholder="neil-fox">
         
-        <label for="utmContent">utm_content (optional, e.g., video1 or discount-code)</label>
-        <input type="text" id="utmContent" placeholder="video1">
+        <label for="utmContent">utm_content (optional: video-id, discount-code, bio-link)</label>
+        <input type="text" id="utmContent" placeholder="video-main">
         
         <button type="submit">Generate UTM Link</button>
     </form>
+
+    <div class="presets">
+        <button class="preset-btn" onclick="applyPreset('youtube')">📺 YouTube Creator</button>
+        <button class="preset-btn" onclick="applyPreset('instagram')">📷 Instagram</button>
+        <button class="preset-btn" onclick="applyPreset('discount')">💰 Discount Code</button>
+        <button class="preset-btn" onclick="applyPreset('partnership')">🤝 Partnership</button>
+    </div>
     
     <div id="result" class="result" style="display: none;">
-        <h2>Generated Link</h2>
-        <p id="generatedUrl"></p>
-        <button onclick="copyToClipboard()">Copy to Clipboard</button>
+        <h2>✅ Generated Link</h2>
+        <p id="generatedUrl" style="font-family: monospace; background: white; padding: 10px; border-radius: 4px;"></p>
+        <button onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+        <button onclick="clearForm()" style="background: #666; margin-left: 10px;">New</button>
     </div>
 
+    <div class="history" id="history"></div>
+
     <script>
-        function buildUTM() {
-            const baseUrl = document.getElementById('baseUrl').value.trim();
-            if (!baseUrl) return;
+        let history = [];
 
-            let url = new URL(baseUrl);
-            const params = new URLSearchParams(url.search);
+        const presets = {
+            youtube: {source: 'youtube', medium: 'creator'},
+            instagram: {source: 'instagram', medium: 'social'},
+            discount: {source: 'promo', medium: 'discount', content: 'code'},
+            partnership: {source: 'creator', medium: 'partnership', campaign: 'collab-2026'}
+        };
 
-            const source = document.getElementById('utmSource').value.trim();
-            const medium = document.getElementById('utmMedium').value.trim();
-            const campaign = document.getElementById('utmCampaign').value.trim();
-            const term = document.getElementById('utmTerm').value.trim();
-            const content = document.getElementById('utmContent').value.trim();
-
-            if (source) params.set('utm_source', source);
-            if (medium) params.set('utm_medium', medium);
-            if (campaign) params.set('utm_campaign', campaign);
-            if (term) params.set('utm_term', term);
-            if (content) params.set('utm_content', content);
-
-            url.search = params.toString();
-            return url.toString();
+        function applyPreset(type) {
+            const p = presets[type];
+            if (p) {
+                if (p.source) document.getElementById('utmSource').value = p.source;
+                if (p.medium) document.getElementById('utmMedium').value = p.medium;
+                if (p.campaign) document.getElementById('utmCampaign').value = p.campaign;
+                if (p.content) document.getElementById('utmContent').value = p.content;
+            }
         }
 
-        document.getElementById('utmForm').addEventListener('submit', function(e) {
+        function buildUTM() {
+            const baseUrlStr = document.getElementById('baseUrl').value.trim();
+            if (!baseUrlStr) {
+                alert('Base URL is required');
+                return null;
+            }
+            let url;
+            try {
+                url = new URL(baseUrlStr.startsWith('http') ? baseUrlStr : 'https://' + baseUrlStr);
+            } catch (e) {
+                alert('Please enter a valid URL');
+                return null;
+            }
+            const params = new URLSearchParams(url.search);
+            const fields = ['source', 'medium', 'campaign', 'term', 'content'];
+            fields.forEach(f => {
+                const val = document.getElementById('utm' + f.charAt(0).toUpperCase() + f.slice(1)).value.trim();
+                if (val) params.set('utm_' + f, val);
+            });
+            url.search = params.toString();
+            const full = url.toString();
+            // History
+            history.unshift({url: full, time: new Date().toLocaleString()});
+            if (history.length > 10) history.pop();
+            renderHistory();
+            return full;
+        }
+
+        document.getElementById('utmForm').addEventListener('submit', e => {
             e.preventDefault();
             const link = buildUTM();
             if (link) {
-                document.getElementById('generatedUrl').textContent = link;
+                document.getElementById('generatedUrl').innerHTML = `<a href="${link}" target="_blank">${link}</a>`;
                 document.getElementById('result').style.display = 'block';
             }
         });
 
         function copyToClipboard() {
-            const urlText = document.getElementById('generatedUrl').textContent;
-            navigator.clipboard.writeText(urlText).then(() => {
-                alert('Link copied to clipboard!');
+            const text = document.getElementById('generatedUrl').textContent || document.getElementById('generatedUrl').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ Link copied! Ready for your creator outreach or campaign docs.');
             });
         }
 
-        // Quick presets for creator campaigns
-        const presets = {
-            'youtube': {source: 'youtube', medium: 'social'},
-            'instagram': {source: 'instagram', medium: 'social'},
-            'creator': {source: 'creator', medium: 'partnership'}
+        function renderHistory() {
+            const div = document.getElementById('history');
+            div.innerHTML = `<h3>Recent UTM Links (last 10)</h3>` + history.map((h, i) => `<p><small>${h.time}</small><br><a href="${h.url}" target="_blank" style="color: #0070f3;">${h.url}</a></p>`).join('');
+        }
+
+        function clearForm() {
+            document.getElementById('utmForm').reset();
+            document.getElementById('result').style.display = 'none';
+        }
+
+        // Demo data
+        window.onload = () => {
+            document.getElementById('baseUrl').value = 'https://example.com/shop';
         };
     </script>
 </body>
