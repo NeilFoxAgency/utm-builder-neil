@@ -1,33 +1,38 @@
 # UTM Builder by Neil Fox Agency
 
-Simple, privacy-first UTM link builder optimized for YouTube creator partnerships, outreach campaigns, discount codes, and small business marketing.
+**Simple, privacy-first UTM link builder** for YouTube creator partnerships, outreach, discount codes, campaign tracking, and small business marketing.
 
-**Live at:** https://utm-builder-neil.neilfoxagency.com (or host the index.html anywhere)
+**Live Demo:** [utm-builder-neil.neilfoxagency.com](https://utm-builder-neil.neilfoxagency.com)
+
+## Key Improvements Today
+- Creator-specific presets (YouTube, Instagram, Discount, Partnership)
+- Recent links history for easy reuse
+- Better validation and UX
+- Responsive design
+- Enhanced copy feedback
 
 ## Features
-
-- Client-side only: no data leaves your browser
-- Pre-filled suggestions for creator workflows
-- Full UTM parameter support (source, medium, campaign, term, content)
-- Easy copy-to-clipboard
-- Useful for tracking creator deliverable performance, attribution in reports
+- 100% client-side: zero tracking, no servers involved
+- Tailored for creator campaigns and attribution reporting
+- Full UTM parameter support with smart defaults
+- Quick presets and link history
+- Works offline after loading
 
 ## Usage
+1. Visit the live site or open `index.html`
+2. Enter base URL
+3. Use presets or fill fields
+4. Generate, copy, and track performance in analytics
 
-1. Open `index.html` or visit the hosted version
-2. Enter your base landing page URL
-3. Fill UTM fields (e.g., source=youtube, medium=creator)
-4. Generate and copy the link
-5. Use in creator outreach, bios, discount codes, etc.
+Perfect for matching creators, deliverable tracking, UTM consistency in reports.
 
-## Why this tool?
-
-Helps Neil Fox Agency and brands maintain consistent, auditable campaign tracking without relying on third-party services that might collect data.
+## Why Useful
+Solves inconsistent tracking in creator partnerships. Enables clean attribution without invasive tools.
 
 ## License
-
 MIT
 
 ## Contributing
+Open issues/PRs for more presets, export features, or integrations.
 
-See issues or PRs for improvements like presets, validation, or CSV export.
+Made with ❤️ for Neil Fox Agency workflows.
