@@ -9,7 +9,7 @@
         input, select, button { padding: 12px; margin: 8px 0; width: 100%; box-sizing: border-box; border: 1px solid #ddd; border-radius: 6px; }
         button { background: #0070f3; color: white; border: none; cursor: pointer; font-weight: bold; }
         button:hover { background: #0051cc; }
-        .result { background: #f0f0f0; padding: 20px; margin-top: 20px; border-radius: 8px; word-break: break-all; }
+        .result { background: #f0f0f0; padding: 20px; margin-top: 20px; border-radius: 8px; }
         label { display: block; margin-top: 15px; font-weight: 600; }
         .presets { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
         .preset-btn { padding: 8px 16px; background: #eee; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em; }
@@ -18,6 +18,7 @@
         .history p { background: #fafafa; padding: 10px; border-radius: 4px; }
         .tip { font-size: 0.9em; color: #666; margin-top: 5px; }
         .naming { background: #e6f7ff; padding: 15px; border-radius: 6px; margin: 15px 0; font-size: 0.9em; border-left: 4px solid #0070f3; }
+        .export { margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -65,6 +66,7 @@
         <h2>✅ Generated Link</h2>
         <p id="generatedUrl" style="font-family: monospace; background: white; padding: 10px; border-radius: 4px;"></p>
         <button onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+        <button onclick="exportToCSV()" class="export" style="background: #28a745;">📊 Export History to CSV</button>
         <button onclick="clearForm()" style="background: #666; margin-left: 10px;">New Link</button>
     </div>
 
@@ -91,8 +93,8 @@
                 if (p.source) document.getElementById('utmSource').value = p.source;
                 if (p.medium) document.getElementById('utmMedium').value = p.medium;
                 if (p.campaign) document.getElementById('utmCampaign').value = p.campaign;
-                if (p.content) document.getElementById('utmContent').value = p.content;
-                if (p.term) document.getElementById('utmTerm').value = p.term;
+                if (p.content) document.getElementById('utmContent').value = p.content || '';
+                if (p.term) document.getElementById('utmTerm').value = p.term || '';
             }
         }
 
@@ -120,7 +122,13 @@
             });
             url.search = params.toString();
             const full = url.toString();
-            history.unshift({url: full, time: new Date().toLocaleString()});
+            history.unshift({url: full, time: new Date().toLocaleString(), params: {
+                source: sanitize(document.getElementById('utmSource').value),
+                medium: sanitize(document.getElementById('utmMedium').value),
+                campaign: sanitize(document.getElementById('utmCampaign').value),
+                term: sanitize(document.getElementById('utmTerm').value),
+                content: sanitize(document.getElementById('utmContent').value)
+            }});
             if (history.length > 10) history.pop();
             renderHistory();
             return full;
@@ -140,6 +148,25 @@
             navigator.clipboard.writeText(text).then(() => {
                 alert('✅ Link copied! Perfect for creator outreach, contracts, and reporting.');
             });
+        }
+
+        function exportToCSV() {
+            if (history.length === 0) {
+                alert('No history to export yet. Generate some links first.');
+                return;
+            }
+            let csv = 'Time,URL,Source,Medium,Campaign,Term,Content\n';
+            history.forEach(h => {
+                csv += `"${h.time}","${h.url}","${h.params.source || ''}","${h.params.medium || ''}","${h.params.campaign || ''}","${h.params.term || ''}","${h.params.content || ''}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `utm_campaign_history_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            alert('✅ History exported to CSV. Great for campaign reporting and data hygiene!');
         }
 
         function renderHistory() {
