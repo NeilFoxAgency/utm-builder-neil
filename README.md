@@ -10,12 +10,14 @@
 - Dedicated naming tips panel with best practices for creator campaigns
 - Improved input sanitization and UX feedback
 - Better copy button experience
+- **New: CSV export of link history for easy campaign reporting**
 
 ## Features
 - 100% client-side: zero tracking, no servers involved
 - Tailored for creator campaigns and attribution reporting
 - Full UTM parameter support with smart defaults and validation
 - Quick presets and persistent link history
+- CSV export for batch analysis and reporting
 - Works offline after loading
 - Responsive and accessible
 
@@ -29,16 +31,17 @@
 2. Enter base URL
 3. Apply presets or customize fields (auto-sanitized)
 4. Generate, copy, and track in your analytics dashboard
+5. Export history to CSV for reporting
 
 Perfect for Neil Fox Agency creator matching, outreach, deliverable tracking, UTM consistency, and reporting.
 
 ## Why Useful
-Eliminates inconsistent UTM tracking in creator partnerships. Provides clean, comparable attribution data without complex tools or data collection.
+Eliminates inconsistent UTM tracking in creator partnerships. Provides clean, comparable attribution data without complex tools or data collection. CSV export aids in data hygiene and performance analysis.
 
 ## License
 MIT
 
 ## Contributing
-Open issues or PRs for additional presets, CSV export, batch generation, or other campaign helpers.
+Open issues or PRs for additional presets, more export options, batch generation, or other campaign helpers.
 
 Made with ❤️ for small business, creator economy, and agency workflows.
