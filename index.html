@@ -3,191 +3,300 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Privacy-first UTM link builder for creator campaigns with GA4 utm_id support. Fully client-side.">
     <title>UTM Builder - Neil Fox Agency</title>
     <style>
-        body { font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.6; }
-        input, select, button { padding: 12px; margin: 8px 0; width: 100%; box-sizing: border-box; border: 1px solid #ddd; border-radius: 6px; }
+        body { font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.6; color: #111; }
+        input, select, button { padding: 12px; margin: 8px 0; width: 100%; box-sizing: border-box; border: 1px solid #ddd; border-radius: 6px; font: inherit; }
         button { background: #0070f3; color: white; border: none; cursor: pointer; font-weight: bold; }
         button:hover { background: #0051cc; }
+        button:focus-visible, input:focus-visible, a:focus-visible, .preset-btn:focus-visible {
+            outline: 3px solid #0070f3;
+            outline-offset: 2px;
+        }
         .result { background: #f0f0f0; padding: 20px; margin-top: 20px; border-radius: 8px; }
         label { display: block; margin-top: 15px; font-weight: 600; }
         .presets { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
-        .preset-btn { padding: 8px 16px; background: #eee; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em; }
+        .preset-btn { padding: 8px 16px; background: #eee; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em; width: auto; color: #111; font-weight: 600; }
         .preset-btn:hover { background: #ddd; }
         .history { margin-top: 30px; }
-        .history p { background: #fafafa; padding: 10px; border-radius: 4px; }
-        .tip { font-size: 0.9em; color: #666; margin-top: 5px; }
+        .history p { background: #fafafa; padding: 10px; border-radius: 4px; word-break: break-all; }
+        .tip { font-size: 0.9em; color: #555; margin-top: 5px; }
         .naming { background: #e6f7ff; padding: 15px; border-radius: 6px; margin: 15px 0; font-size: 0.9em; border-left: 4px solid #0070f3; }
         .export { margin-top: 10px; }
+        #generatedUrl {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            word-break: break-all;
+        }
     </style>
 </head>
 <body>
     <h1>UTM Builder for Creator Campaigns</h1>
     <p>Privacy-first tool optimized for YouTube creator partnerships, outreach, discount codes, and attribution reporting. Built for Neil Fox Agency workflows. Client-side only.</p>
-    
+
     <div class="naming">
         <strong>Best Practice Naming Conventions (auto-enforced):</strong><br>
         • Lowercase only • Use underscores instead of spaces • No special characters<br>
-        Examples: youtube_creator_summer, john_doe_reel, promo_summer_discount
+        Examples: youtube_creator_summer, john_doe_reel, promo_summer_discount<br>
+        <strong>utm_id:</strong> optional stable GA4 campaign ID (one ID per campaign name)
     </div>
 
     <form id="utmForm">
         <label for="baseUrl">Base URL (e.g., landing page or product page)</label>
         <input type="url" id="baseUrl" placeholder="https://yourbrand.com/landing" required>
-        
+
         <label for="utmSource">utm_source (e.g. youtube, creatorhandle, tiktok)</label>
         <input type="text" id="utmSource" placeholder="youtube" class="lowercase-input">
         <span class="tip">Platform or creator handle</span>
-        
+
         <label for="utmMedium">utm_medium (e.g. creator, influencer, partnership, discount)</label>
         <input type="text" id="utmMedium" placeholder="creator" class="lowercase-input">
-        
+
         <label for="utmCampaign">utm_campaign (e.g. collab-summer-2026)</label>
         <input type="text" id="utmCampaign" placeholder="collab-summer-2026" class="lowercase-input">
-        
+
+        <label for="utmId">utm_id (optional: GA4 campaign ID)</label>
+        <input type="text" id="utmId" placeholder="cmp_summer_2026" class="id-input">
+        <span class="tip">Stable campaign identifier for GA4. Prefer one ID per campaign name.</span>
+
         <label for="utmTerm">utm_term (optional: keyword or audience segment)</label>
-        <input type="text" id="utmTerm" placeholder="fitness">
-        
+        <input type="text" id="utmTerm" placeholder="fitness" class="lowercase-input">
+
         <label for="utmContent">utm_content (optional: video-id, discount-code, bio-link, placement)</label>
-        <input type="text" id="utmContent" placeholder="video-main">
-        
+        <input type="text" id="utmContent" placeholder="video-main" class="lowercase-input">
+
         <button type="submit">Generate UTM Link</button>
     </form>
 
     <div class="presets">
-        <button class="preset-btn" onclick="applyPreset('youtube')">📺 YouTube Creator</button>
-        <button class="preset-btn" onclick="applyPreset('instagram')">📷 Instagram</button>
-        <button class="preset-btn" onclick="applyPreset('discount')">💰 Discount Code</button>
-        <button class="preset-btn" onclick="applyPreset('partnership')">🤝 Partnership</button>
-        <button class="preset-btn" onclick="applyPreset('influencer')">🌟 General Influencer</button>
+        <button type="button" class="preset-btn" data-preset="youtube">📺 YouTube Creator</button>
+        <button type="button" class="preset-btn" data-preset="instagram">📷 Instagram</button>
+        <button type="button" class="preset-btn" data-preset="discount">💰 Discount Code</button>
+        <button type="button" class="preset-btn" data-preset="partnership">🤝 Partnership</button>
+        <button type="button" class="preset-btn" data-preset="influencer">🌟 General Influencer</button>
     </div>
-    
+
     <div id="result" class="result" style="display: none;">
         <h2>✅ Generated Link</h2>
-        <p id="generatedUrl" style="font-family: monospace; background: white; padding: 10px; border-radius: 4px;"></p>
-        <button onclick="copyToClipboard()">📋 Copy to Clipboard</button>
-        <button onclick="exportToCSV()" class="export" style="background: #28a745;">📊 Export History to CSV</button>
-        <button onclick="clearForm()" style="background: #666; margin-left: 10px;">New Link</button>
+        <p id="generatedUrl"></p>
+        <button type="button" id="copyBtn">📋 Copy to Clipboard</button>
+        <button type="button" id="exportBtn" class="export" style="background: #28a745;">📊 Export History to CSV</button>
+        <button type="button" id="clearFormBtn" style="background: #666; margin-left: 10px;">New Link</button>
     </div>
 
     <div class="history" id="history"></div>
 
     <script>
-        let history = [];
+        (function () {
+            'use strict';
 
-        const presets = {
-            youtube: {source: 'youtube', medium: 'creator', campaign: 'summer-collab-2026'},
-            instagram: {source: 'instagram', medium: 'social', campaign: 'summer-collab-2026'},
-            discount: {source: 'promo', medium: 'discount', content: 'summer-code-abc'},
-            partnership: {source: 'creator', medium: 'partnership', campaign: 'summer-collab-2026'},
-            influencer: {source: 'influencer', medium: 'influencer', campaign: 'q3-creator-seeding'}
-        };
+            let history = [];
 
-        function sanitize(val) {
-            return (val || '').toLowerCase().trim().replace(/\s+/g, '_').replace(/[^a-z0-9_-]/g, '');
-        }
+            const presets = {
+                youtube: { source: 'youtube', medium: 'creator', campaign: 'summer-collab-2026', id: 'cmp_summer_2026' },
+                instagram: { source: 'instagram', medium: 'social', campaign: 'summer-collab-2026', id: 'cmp_summer_2026' },
+                discount: { source: 'promo', medium: 'discount', content: 'summer-code-abc', id: 'cmp_promo_summer' },
+                partnership: { source: 'creator', medium: 'partnership', campaign: 'summer-collab-2026', id: 'cmp_summer_2026' },
+                influencer: { source: 'influencer', medium: 'influencer', campaign: 'q3-creator-seeding', id: 'cmp_q3_seeding' }
+            };
 
-        function applyPreset(type) {
-            const p = presets[type];
-            if (p) {
+            function sanitize(val) {
+                return (val || '').toLowerCase().trim().replace(/\s+/g, '_').replace(/[^a-z0-9_-]/g, '');
+            }
+
+            /** Allow alphanumerics plus common ID separators; do not force lowercase. */
+            function sanitizeId(val) {
+                return (val || '').trim().replace(/\s+/g, '_').replace(/[^a-zA-Z0-9._:-]/g, '');
+            }
+
+            function csvSafe(value) {
+                const s = String(value == null ? '' : value);
+                if (/^[=+\-@\t\r\n]/.test(s)) {
+                    return "'" + s;
+                }
+                return s;
+            }
+
+            function escapeCsvField(value) {
+                const safe = csvSafe(value);
+                return '"' + String(safe).replace(/"/g, '""') + '"';
+            }
+
+            function applyPreset(type) {
+                const p = presets[type];
+                if (!p) return;
                 if (p.source) document.getElementById('utmSource').value = p.source;
                 if (p.medium) document.getElementById('utmMedium').value = p.medium;
                 if (p.campaign) document.getElementById('utmCampaign').value = p.campaign;
-                if (p.content) document.getElementById('utmContent').value = p.content || '';
-                if (p.term) document.getElementById('utmTerm').value = p.term || '';
+                document.getElementById('utmId').value = p.id || '';
+                document.getElementById('utmContent').value = p.content || '';
+                document.getElementById('utmTerm').value = p.term || '';
             }
-        }
 
-        function buildUTM() {
-            const baseUrlStr = document.getElementById('baseUrl').value.trim();
-            if (!baseUrlStr) {
-                alert('Base URL is required');
-                return null;
-            }
-            let url;
-            try {
-                url = new URL(baseUrlStr.startsWith('http') ? baseUrlStr : 'https://' + baseUrlStr);
-            } catch (e) {
-                alert('Please enter a valid URL');
-                return null;
-            }
-            const params = new URLSearchParams(url.search);
-            const fields = ['source', 'medium', 'campaign', 'term', 'content'];
-            fields.forEach(f => {
-                let val = document.getElementById('utm' + f.charAt(0).toUpperCase() + f.slice(1)).value.trim();
-                if (val) {
-                    val = sanitize(val);
-                    params.set('utm_' + f, val);
+            function buildUTM() {
+                const baseUrlStr = document.getElementById('baseUrl').value.trim();
+                if (!baseUrlStr) {
+                    alert('Base URL is required');
+                    return null;
                 }
-            });
-            url.search = params.toString();
-            const full = url.toString();
-            history.unshift({url: full, time: new Date().toLocaleString(), params: {
-                source: sanitize(document.getElementById('utmSource').value),
-                medium: sanitize(document.getElementById('utmMedium').value),
-                campaign: sanitize(document.getElementById('utmCampaign').value),
-                term: sanitize(document.getElementById('utmTerm').value),
-                content: sanitize(document.getElementById('utmContent').value)
-            }});
-            if (history.length > 10) history.pop();
-            renderHistory();
-            return full;
-        }
+                let url;
+                try {
+                    url = new URL(baseUrlStr.startsWith('http') ? baseUrlStr : 'https://' + baseUrlStr);
+                } catch (e) {
+                    alert('Please enter a valid URL');
+                    return null;
+                }
+                if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+                    alert('Only http and https URLs are supported');
+                    return null;
+                }
+                const params = new URLSearchParams(url.search);
+                const standardFields = ['source', 'medium', 'campaign', 'term', 'content'];
+                const collected = {};
+                standardFields.forEach(function (f) {
+                    const el = document.getElementById('utm' + f.charAt(0).toUpperCase() + f.slice(1));
+                    let val = el ? el.value.trim() : '';
+                    if (val) {
+                        val = sanitize(val);
+                        params.set('utm_' + f, val);
+                        collected[f] = val;
+                    } else {
+                        collected[f] = '';
+                    }
+                });
+                let idVal = document.getElementById('utmId').value.trim();
+                if (idVal) {
+                    idVal = sanitizeId(idVal);
+                    params.set('utm_id', idVal);
+                    collected.id = idVal;
+                } else {
+                    collected.id = '';
+                }
+                url.search = params.toString();
+                const full = url.toString();
+                history.unshift({
+                    url: full,
+                    time: new Date().toLocaleString(),
+                    params: collected
+                });
+                if (history.length > 10) history.pop();
+                renderHistory();
+                return full;
+            }
 
-        document.getElementById('utmForm').addEventListener('submit', e => {
-            e.preventDefault();
-            const link = buildUTM();
-            if (link) {
-                document.getElementById('generatedUrl').innerHTML = `<a href="${link}" target="_blank" rel="noopener noreferrer">${link}</a>`;
+            function showGenerated(link) {
+                const container = document.getElementById('generatedUrl');
+                container.textContent = '';
+                const a = document.createElement('a');
+                a.href = link;
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                a.textContent = link;
+                container.appendChild(a);
                 document.getElementById('result').style.display = 'block';
             }
-        });
 
-        function copyToClipboard() {
-            const text = document.getElementById('generatedUrl').textContent || document.getElementById('generatedUrl').innerText;
-            navigator.clipboard.writeText(text).then(() => {
-                alert('✅ Link copied! Perfect for creator outreach, contracts, and reporting.');
+            document.getElementById('utmForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const link = buildUTM();
+                if (link) showGenerated(link);
             });
-        }
 
-        function exportToCSV() {
-            if (history.length === 0) {
-                alert('No history to export yet. Generate some links first.');
-                return;
+            document.querySelectorAll('.preset-btn').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    applyPreset(btn.getAttribute('data-preset'));
+                });
+            });
+
+            document.getElementById('copyBtn').addEventListener('click', function () {
+                const linkEl = document.querySelector('#generatedUrl a');
+                const text = linkEl ? linkEl.href : '';
+                if (!text) return;
+                navigator.clipboard.writeText(text).then(function () {
+                    alert('✅ Link copied! Perfect for creator outreach, contracts, and reporting.');
+                });
+            });
+
+            document.getElementById('exportBtn').addEventListener('click', function () {
+                if (history.length === 0) {
+                    alert('No history to export yet. Generate some links first.');
+                    return;
+                }
+                const lines = ['Time,URL,Source,Medium,Campaign,Id,Term,Content'];
+                history.forEach(function (h) {
+                    const p = h.params || {};
+                    lines.push([
+                        escapeCsvField(h.time),
+                        escapeCsvField(h.url),
+                        escapeCsvField(p.source || ''),
+                        escapeCsvField(p.medium || ''),
+                        escapeCsvField(p.campaign || ''),
+                        escapeCsvField(p.id || ''),
+                        escapeCsvField(p.term || ''),
+                        escapeCsvField(p.content || '')
+                    ].join(','));
+                });
+                const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'utm_campaign_history_' + new Date().toISOString().slice(0, 10) + '.csv';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                alert('✅ History exported to CSV (includes utm_id; formula-safe cells).');
+            });
+
+            document.getElementById('clearFormBtn').addEventListener('click', function () {
+                document.getElementById('utmForm').reset();
+                document.getElementById('result').style.display = 'none';
+            });
+
+            function renderHistory() {
+                const div = document.getElementById('history');
+                div.textContent = '';
+                const heading = document.createElement('h3');
+                heading.textContent = 'Recent UTM Links (last 10) - Reuse for consistent tracking';
+                div.appendChild(heading);
+                history.forEach(function (h) {
+                    const p = document.createElement('p');
+                    const small = document.createElement('small');
+                    small.textContent = h.time || '';
+                    p.appendChild(small);
+                    p.appendChild(document.createElement('br'));
+                    const a = document.createElement('a');
+                    a.href = h.url;
+                    a.target = '_blank';
+                    a.rel = 'noopener noreferrer';
+                    a.style.color = '#0070f3';
+                    a.textContent = h.url;
+                    p.appendChild(a);
+                    div.appendChild(p);
+                });
             }
-            let csv = 'Time,URL,Source,Medium,Campaign,Term,Content\n';
-            history.forEach(h => {
-                csv += `"${h.time}","${h.url}","${h.params.source || ''}","${h.params.medium || ''}","${h.params.campaign || ''}","${h.params.term || ''}","${h.params.content || ''}"\n`;
+
+            document.querySelectorAll('.lowercase-input').forEach(function (input) {
+                input.addEventListener('blur', function () {
+                    this.value = sanitize(this.value);
+                });
             });
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `utm_campaign_history_${new Date().toISOString().slice(0,10)}.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
-            alert('✅ History exported to CSV. Great for campaign reporting and data hygiene!');
-        }
 
-        function renderHistory() {
-            const div = document.getElementById('history');
-            div.innerHTML = `<h3>Recent UTM Links (last 10) - Reuse for consistent tracking</h3>` + history.map((h, i) => `<p><small>${h.time}</small><br><a href="${h.url}" target="_blank" rel="noopener noreferrer" style="color: #0070f3;">${h.url}</a></p>`).join('');
-        }
-
-        function clearForm() {
-            document.getElementById('utmForm').reset();
-            document.getElementById('result').style.display = 'none';
-        }
-
-        document.querySelectorAll('.lowercase-input').forEach(input => {
-            input.addEventListener('blur', function() {
-                this.value = sanitize(this.value);
+            document.querySelectorAll('.id-input').forEach(function (input) {
+                input.addEventListener('blur', function () {
+                    this.value = sanitizeId(this.value);
+                });
             });
-        });
 
-        window.onload = () => {
-            document.getElementById('baseUrl').value = 'https://example.com/creator-landing';
-        };
+            window.addEventListener('DOMContentLoaded', function () {
+                if (!document.getElementById('baseUrl').value) {
+                    document.getElementById('baseUrl').value = 'https://example.com/creator-landing';
+                }
+            });
+        })();
     </script>
 </body>
 </html>
