@@ -4,44 +4,45 @@
 
 **Live Demo:** [utm-builder-neil.neilfoxagency.com](https://utm-builder-neil.neilfoxagency.com)
 
-## Recent Improvements
-- Automatic enforcement of UTM naming conventions (lowercase, underscores)
-- New 'General Influencer' preset and enhanced others
-- Dedicated naming tips panel with best practices for creator campaigns
-- Improved input sanitization and UX feedback
-- Better copy button experience
-- **New: CSV export of link history for easy campaign reporting**
-
 ## Features
+
 - 100% client-side: zero tracking, no servers involved
 - Tailored for creator campaigns and attribution reporting
-- Full UTM parameter support with smart defaults and validation
-- Quick presets and persistent link history
-- CSV export for batch analysis and reporting
+- Full UTM parameter support including optional **utm_id** (GA4 campaign ID)
+- Smart defaults, lowercase naming enforcement, and validation
+- Quick presets and in-session link history
+- Formula-safe CSV export for campaign reporting
+- Safe URL rendering (no `innerHTML` injection of generated links)
 - Works offline after loading
-- Responsive and accessible
 
-## Best Practices Integrated
-- Consistent lowercase naming to prevent reporting issues
+## Best practices integrated
+
+- Consistent lowercase naming for source/medium/campaign/term/content
+- Optional stable `utm_id` for GA4 campaign ID reporting (one ID per campaign name)
 - Platform/creator separation in parameters
 - Ready for GA4 and other analytics
 
 ## Usage
+
 1. Visit the live site or clone and open `index.html`
 2. Enter base URL
 3. Apply presets or customize fields (auto-sanitized)
-4. Generate, copy, and track in your analytics dashboard
-5. Export history to CSV for reporting
+4. Optionally set `utm_id` for a stable GA4 campaign identifier
+5. Generate, copy, and track in your analytics dashboard
+6. Export history to CSV for reporting
 
 Perfect for Neil Fox Agency creator matching, outreach, deliverable tracking, UTM consistency, and reporting.
 
-## Why Useful
-Eliminates inconsistent UTM tracking in creator partnerships. Provides clean, comparable attribution data without complex tools or data collection. CSV export aids in data hygiene and performance analysis.
+## Why useful
+
+Eliminates inconsistent UTM tracking in creator partnerships. Provides clean, comparable attribution data without complex tools or data collection. CSV export aids data hygiene and performance analysis. `utm_id` support aligns with GA4 campaign ID reporting and with offline governance tools such as [creator-link-kit](https://github.com/NeilFoxAgency/creator-link-kit).
 
 ## License
+
 MIT
 
 ## Contributing
+
 Open issues or PRs for additional presets, more export options, batch generation, or other campaign helpers.
 
-Made with ❤️ for small business, creator economy, and agency workflows.
+Made with care for small business, the creator economy, and agency workflows.
