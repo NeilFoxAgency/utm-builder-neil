@@ -5,82 +5,91 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UTM Builder - Neil Fox Agency</title>
     <style>
-        body { font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.6; }
-        input, select, button { padding: 12px; margin: 8px 0; width: 100%; box-sizing: border-box; border: 1px solid #ddd; border-radius: 6px; }
+        body { font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.6; color: #111; }
+        input, select, button { padding: 12px; margin: 8px 0; width: 100%; box-sizing: border-box; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; }
         button { background: #0070f3; color: white; border: none; cursor: pointer; font-weight: bold; }
         button:hover { background: #0051cc; }
+        button:focus-visible, .preset-btn:focus-visible, a:focus-visible { outline: 3px solid #0070f3; outline-offset: 2px; }
         .result { background: #f0f0f0; padding: 20px; margin-top: 20px; border-radius: 8px; }
         label { display: block; margin-top: 15px; font-weight: 600; }
         .presets { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
-        .preset-btn { padding: 8px 16px; background: #eee; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em; }
+        .preset-btn { padding: 8px 16px; background: #eee; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em; width: auto; }
         .preset-btn:hover { background: #ddd; }
         .history { margin-top: 30px; }
         .history p { background: #fafafa; padding: 10px; border-radius: 4px; }
-        .tip { font-size: 0.9em; color: #666; margin-top: 5px; }
+        .tip { font-size: 0.9em; color: #555; margin-top: 5px; }
         .naming { background: #e6f7ff; padding: 15px; border-radius: 6px; margin: 15px 0; font-size: 0.9em; border-left: 4px solid #0070f3; }
         .export { margin-top: 10px; }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
     </style>
 </head>
 <body>
     <h1>UTM Builder for Creator Campaigns</h1>
-    <p>Privacy-first tool optimized for YouTube creator partnerships, outreach, discount codes, and attribution reporting. Built for Neil Fox Agency workflows. Client-side only.</p>
+    <p>Privacy-first tool optimized for YouTube creator partnerships, outreach, discount codes, and attribution reporting. Built for Neil Fox Agency workflows. Client-side only — no tracking, no server.</p>
     
-    <div class="naming">
+    <div class="naming" role="note">
         <strong>Best Practice Naming Conventions (auto-enforced):</strong><br>
-        • Lowercase only • Use underscores instead of spaces • No special characters<br>
-        Examples: youtube_creator_summer, john_doe_reel, promo_summer_discount
+        • Lowercase only • Use underscores or hyphens • No spaces or special characters<br>
+        • Prefer a stable <code>utm_id</code> (campaign ID) for GA4 and multi-placement reporting<br>
+        Examples: youtube_creator_summer, cmp-glowdrop-launch, plc-greta-video-01
     </div>
 
-    <form id="utmForm">
+    <form id="utmForm" aria-labelledby="form-heading">
+        <h2 id="form-heading" class="sr-only">UTM parameters</h2>
         <label for="baseUrl">Base URL (e.g., landing page or product page)</label>
-        <input type="url" id="baseUrl" placeholder="https://yourbrand.com/landing" required>
+        <input type="url" id="baseUrl" placeholder="https://yourbrand.com/landing" required autocomplete="url">
         
         <label for="utmSource">utm_source (e.g. youtube, creatorhandle, tiktok)</label>
-        <input type="text" id="utmSource" placeholder="youtube" class="lowercase-input">
+        <input type="text" id="utmSource" placeholder="youtube" class="lowercase-input" autocomplete="off">
         <span class="tip">Platform or creator handle</span>
         
         <label for="utmMedium">utm_medium (e.g. creator, influencer, partnership, discount)</label>
-        <input type="text" id="utmMedium" placeholder="creator" class="lowercase-input">
+        <input type="text" id="utmMedium" placeholder="creator" class="lowercase-input" autocomplete="off">
         
         <label for="utmCampaign">utm_campaign (e.g. collab-summer-2026)</label>
-        <input type="text" id="utmCampaign" placeholder="collab-summer-2026" class="lowercase-input">
+        <input type="text" id="utmCampaign" placeholder="collab-summer-2026" class="lowercase-input" autocomplete="off">
+        
+        <label for="utmId">utm_id (optional but recommended: stable campaign ID for GA4)</label>
+        <input type="text" id="utmId" placeholder="cmp-summer-collab-2026" class="lowercase-input" autocomplete="off">
+        <span class="tip">Use one immutable campaign ID across all placements in the same campaign. Maps cleanly to creator-link-kit <code>campaign_id</code>.</span>
         
         <label for="utmTerm">utm_term (optional: keyword or audience segment)</label>
-        <input type="text" id="utmTerm" placeholder="fitness">
+        <input type="text" id="utmTerm" placeholder="fitness" autocomplete="off">
         
-        <label for="utmContent">utm_content (optional: video-id, discount-code, bio-link, placement)</label>
-        <input type="text" id="utmContent" placeholder="video-main">
+        <label for="utmContent">utm_content (optional: video-id, placement_id, discount-code, bio-link)</label>
+        <input type="text" id="utmContent" placeholder="plc-video-main" class="lowercase-input" autocomplete="off">
+        <span class="tip">Prefer a unique placement ID when a creator has more than one sponsored asset.</span>
         
         <button type="submit">Generate UTM Link</button>
     </form>
 
-    <div class="presets">
-        <button class="preset-btn" onclick="applyPreset('youtube')">📺 YouTube Creator</button>
-        <button class="preset-btn" onclick="applyPreset('instagram')">📷 Instagram</button>
-        <button class="preset-btn" onclick="applyPreset('discount')">💰 Discount Code</button>
-        <button class="preset-btn" onclick="applyPreset('partnership')">🤝 Partnership</button>
-        <button class="preset-btn" onclick="applyPreset('influencer')">🌟 General Influencer</button>
+    <div class="presets" role="group" aria-label="Quick presets">
+        <button type="button" class="preset-btn" onclick="applyPreset('youtube')">📺 YouTube Creator</button>
+        <button type="button" class="preset-btn" onclick="applyPreset('instagram')">📷 Instagram</button>
+        <button type="button" class="preset-btn" onclick="applyPreset('discount')">💰 Discount Code</button>
+        <button type="button" class="preset-btn" onclick="applyPreset('partnership')">🤝 Partnership</button>
+        <button type="button" class="preset-btn" onclick="applyPreset('influencer')">🌟 General Influencer</button>
     </div>
     
-    <div id="result" class="result" style="display: none;">
+    <div id="result" class="result" style="display: none;" role="region" aria-live="polite" aria-label="Generated link">
         <h2>✅ Generated Link</h2>
-        <p id="generatedUrl" style="font-family: monospace; background: white; padding: 10px; border-radius: 4px;"></p>
-        <button onclick="copyToClipboard()">📋 Copy to Clipboard</button>
-        <button onclick="exportToCSV()" class="export" style="background: #28a745;">📊 Export History to CSV</button>
-        <button onclick="clearForm()" style="background: #666; margin-left: 10px;">New Link</button>
+        <p id="generatedUrl" style="font-family: monospace; background: white; padding: 10px; border-radius: 4px; word-break: break-all;"></p>
+        <button type="button" onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+        <button type="button" onclick="exportToCSV()" class="export" style="background: #28a745;">📊 Export History to CSV</button>
+        <button type="button" onclick="clearForm()" style="background: #666; margin-left: 10px;">New Link</button>
     </div>
 
-    <div class="history" id="history"></div>
+    <div class="history" id="history" aria-live="polite"></div>
 
     <script>
         let history = [];
 
         const presets = {
-            youtube: {source: 'youtube', medium: 'creator', campaign: 'summer-collab-2026'},
-            instagram: {source: 'instagram', medium: 'social', campaign: 'summer-collab-2026'},
-            discount: {source: 'promo', medium: 'discount', content: 'summer-code-abc'},
-            partnership: {source: 'creator', medium: 'partnership', campaign: 'summer-collab-2026'},
-            influencer: {source: 'influencer', medium: 'influencer', campaign: 'q3-creator-seeding'}
+            youtube: {source: 'youtube', medium: 'creator', campaign: 'summer-collab-2026', id: 'cmp-summer-collab-2026'},
+            instagram: {source: 'instagram', medium: 'social', campaign: 'summer-collab-2026', id: 'cmp-summer-collab-2026'},
+            discount: {source: 'promo', medium: 'discount', content: 'summer-code-abc', id: 'cmp-promo-summer'},
+            partnership: {source: 'creator', medium: 'partnership', campaign: 'summer-collab-2026', id: 'cmp-summer-collab-2026'},
+            influencer: {source: 'influencer', medium: 'influencer', campaign: 'q3-creator-seeding', id: 'cmp-q3-creator-seeding'}
         };
 
         function sanitize(val) {
@@ -93,6 +102,7 @@
                 if (p.source) document.getElementById('utmSource').value = p.source;
                 if (p.medium) document.getElementById('utmMedium').value = p.medium;
                 if (p.campaign) document.getElementById('utmCampaign').value = p.campaign;
+                if (p.id) document.getElementById('utmId').value = p.id;
                 if (p.content) document.getElementById('utmContent').value = p.content || '';
                 if (p.term) document.getElementById('utmTerm').value = p.term || '';
             }
@@ -112,23 +122,28 @@
                 return null;
             }
             const params = new URLSearchParams(url.search);
-            const fields = ['source', 'medium', 'campaign', 'term', 'content'];
+            const fields = [
+                { key: 'source', el: 'utmSource' },
+                { key: 'medium', el: 'utmMedium' },
+                { key: 'campaign', el: 'utmCampaign' },
+                { key: 'id', el: 'utmId' },
+                { key: 'term', el: 'utmTerm' },
+                { key: 'content', el: 'utmContent' }
+            ];
+            const captured = {};
             fields.forEach(f => {
-                let val = document.getElementById('utm' + f.charAt(0).toUpperCase() + f.slice(1)).value.trim();
+                let val = document.getElementById(f.el).value.trim();
                 if (val) {
                     val = sanitize(val);
-                    params.set('utm_' + f, val);
+                    params.set('utm_' + f.key, val);
+                    captured[f.key] = val;
+                } else {
+                    captured[f.key] = '';
                 }
             });
             url.search = params.toString();
             const full = url.toString();
-            history.unshift({url: full, time: new Date().toLocaleString(), params: {
-                source: sanitize(document.getElementById('utmSource').value),
-                medium: sanitize(document.getElementById('utmMedium').value),
-                campaign: sanitize(document.getElementById('utmCampaign').value),
-                term: sanitize(document.getElementById('utmTerm').value),
-                content: sanitize(document.getElementById('utmContent').value)
-            }});
+            history.unshift({url: full, time: new Date().toLocaleString(), params: captured});
             if (history.length > 10) history.pop();
             renderHistory();
             return full;
@@ -140,6 +155,7 @@
             if (link) {
                 document.getElementById('generatedUrl').innerHTML = `<a href="${link}" target="_blank" rel="noopener noreferrer">${link}</a>`;
                 document.getElementById('result').style.display = 'block';
+                document.getElementById('result').focus();
             }
         });
 
@@ -147,6 +163,8 @@
             const text = document.getElementById('generatedUrl').textContent || document.getElementById('generatedUrl').innerText;
             navigator.clipboard.writeText(text).then(() => {
                 alert('✅ Link copied! Perfect for creator outreach, contracts, and reporting.');
+            }).catch(() => {
+                alert('Could not copy automatically. Please select and copy the link manually.');
             });
         }
 
@@ -155,9 +173,10 @@
                 alert('No history to export yet. Generate some links first.');
                 return;
             }
-            let csv = 'Time,URL,Source,Medium,Campaign,Term,Content\n';
+            let csv = 'Time,URL,Source,Medium,Campaign,Id,Term,Content\n';
             history.forEach(h => {
-                csv += `"${h.time}","${h.url}","${h.params.source || ''}","${h.params.medium || ''}","${h.params.campaign || ''}","${h.params.term || ''}","${h.params.content || ''}"\n`;
+                const p = h.params || {};
+                csv += `"${h.time}","${h.url}","${p.source || ''}","${p.medium || ''}","${p.campaign || ''}","${p.id || ''}","${p.term || ''}","${p.content || ''}"\n`;
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = URL.createObjectURL(blob);
@@ -171,12 +190,13 @@
 
         function renderHistory() {
             const div = document.getElementById('history');
-            div.innerHTML = `<h3>Recent UTM Links (last 10) - Reuse for consistent tracking</h3>` + history.map((h, i) => `<p><small>${h.time}</small><br><a href="${h.url}" target="_blank" rel="noopener noreferrer" style="color: #0070f3;">${h.url}</a></p>`).join('');
+            div.innerHTML = `<h3>Recent UTM Links (last 10) - Reuse for consistent tracking</h3>` + history.map((h) => `<p><small>${h.time}</small><br><a href="${h.url}" target="_blank" rel="noopener noreferrer" style="color: #0070f3;">${h.url}</a></p>`).join('');
         }
 
         function clearForm() {
             document.getElementById('utmForm').reset();
             document.getElementById('result').style.display = 'none';
+            document.getElementById('baseUrl').focus();
         }
 
         document.querySelectorAll('.lowercase-input').forEach(input => {
