@@ -24,4 +24,4 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Run regression tests
-        run: node --test tests/
+        run: node --test tests/*.js
