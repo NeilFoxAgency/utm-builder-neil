@@ -315,7 +315,18 @@
       var raw = localStorage.getItem(HISTORY_KEY);
       if (!raw) return [];
       var parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed : [];
+      if (!Array.isArray(parsed)) return [];
+      // Defense in depth: only keep entries whose URL is a real http(s)
+      // link. localStorage can be edited outside this page, and rendered
+      // anchor hrefs must never carry another scheme (e.g. javascript:).
+      return parsed.filter(function (item) {
+        return (
+          item !== null &&
+          typeof item === "object" &&
+          typeof item.url === "string" &&
+          /^https?:\/\//i.test(item.url)
+        );
+      });
     } catch (e) {
       return [];
     }

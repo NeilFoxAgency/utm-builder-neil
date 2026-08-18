@@ -40,7 +40,20 @@ Sanitization:
 - History is stored only under the key `nfa_utm_history_v1` in the user’s browser
 - CSV cells that look like spreadsheet formulas are neutralized with a leading apostrophe
 - Generated and history links are built with DOM APIs (`textContent` + `href`), not HTML string injection
+- History entries are re-validated on load, and only `http(s)` links are ever rendered
 - See [SECURITY.md](SECURITY.md)
+
+## Development and tests
+
+The tool ships as a single dependency-free HTML file — there is nothing to install. The regression suite in `tests/` extracts the real inline script from `index.html` and runs it under Node's built-in test runner with a minimal fake DOM, so the shipped artifact itself is verified.
+
+Requirements: Node.js 20 or newer.
+
+```sh
+node --test tests/
+# or
+npm test
+```
 
 ## Related tooling
 
