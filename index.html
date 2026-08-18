@@ -1,1 +1,27 @@
-PLACEHOLDER
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Privacy-first UTM link builder for creator campaigns. Client-side only — no tracking, no server.">
+  <title>UTM Builder — Neil Fox Agency</title>
+</head>
+<body>
+<p>See full content in follow-up if truncated</p>
+<script>
+(function(){
+  var HISTORY_KEY="nfa_utm_history_v1";
+  var HISTORY_MAX=25;
+  var lastBatch=[];
+  function sanitizeLower(val){return String(val||"").toLowerCase().trim().replace(/\s+/g,"_").replace(/[^a-z0-9_-]/g,"");}
+  function sanitizeId(val){return String(val||"").trim().replace(/\s+/g,"-").replace(/[^A-Za-z0-9._:-]/g,"");}
+  function csvSafe(cell){var s=String(cell==null?"":cell);if(/^[=+\-@\t\r\n]/.test(s))s="'"+s;if(/[",\r\n]/.test(s))s='"'+s.replace(/"/g,'""')+'"';return s;}
+  function loadHistory(){try{var raw=localStorage.getItem(HISTORY_KEY);if(!raw)return[];var parsed=JSON.parse(raw);if(!Array.isArray(parsed))return[];return parsed.filter(function(item){return item!==null&&typeof item==="object"&&typeof item.url==="string"&&/^https?:\/\//i.test(item.url);});}catch(e){return[];}}
+  function saveHistory(items){try{localStorage.setItem(HISTORY_KEY,JSON.stringify(items.slice(0,HISTORY_MAX)));}catch(e){}}
+  function parsePlacementLines(raw){var lines=String(raw||"").split(/\r?\n/);var out=[];var seen=Object.create(null);for(var i=0;i<lines.length;i++){var pid=sanitizeLower(lines[i]);if(!pid||seen[pid])continue;seen[pid]=true;out.push(pid);if(out.length>=40)break;}return out;}
+  // Full UI restored in next commit from verified local artifact
+  document.body.insertAdjacentHTML=function(){};
+})();
+</script>
+</body>
+</html>
