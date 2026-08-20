@@ -13,6 +13,7 @@
 - **CSV export** with spreadsheet-formula neutralization
 - Safe DOM rendering (no `innerHTML` for generated URLs)
 - Quick presets aligned with creator campaigns
+- **Batch placements** — paste up to 40 placement IDs; shared UTM fields; unique `utm_content` per line; copy-all and batch CSV
 - Accessibility: skip link, focus-visible outlines, live status region, reduced-motion, dark mode
 - Works offline after the page loads
 
@@ -28,6 +29,7 @@ A creator can publish more than one sponsored video. Put a unique **placement ID
 2. Enter a base URL (http/https only)
 3. Fill fields or apply a preset
 4. Generate, copy, and (optionally) export history as CSV
+5. Optional: paste placement IDs under **Batch placements** to generate many links at once
 
 Sanitization:
 
