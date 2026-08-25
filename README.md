@@ -10,7 +10,8 @@
 - Classic UTM parameters plus optional **`utm_id`** (stable GA4 campaign identifier)
 - Placement-oriented **`utm_content`** guidance (one ID per sponsored asset)
 - **Persistent history** in `localStorage` (max 25 links, never leaves the device)
-- **CSV export** with spreadsheet-formula neutralization
+- **Batch placements** — paste up to 40 placement IDs for multi-video creator campaigns (unique `utm_content` per asset)
+- **CSV export** (history and batch) with spreadsheet-formula neutralization
 - Safe DOM rendering (no `innerHTML` for generated URLs)
 - Quick presets aligned with creator campaigns
 - Accessibility: skip link, focus-visible outlines, live status region, reduced-motion, dark mode
@@ -28,6 +29,7 @@ A creator can publish more than one sponsored video. Put a unique **placement ID
 2. Enter a base URL (http/https only)
 3. Fill fields or apply a preset
 4. Generate, copy, and (optionally) export history as CSV
+5. For multi-asset campaigns: open **Batch placements**, paste one placement ID per line (max 40), then Generate batch — copy all links or export a batch CSV
 
 Sanitization:
 
