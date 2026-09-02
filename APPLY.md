@@ -1,19 +1,24 @@
-# Apply complete batch artifacts
+# Apply batch placements onto main
 
-This branch already contains README updates.
+The implementation was written and verified locally against a copy of `main`.
 
-Verified locally (Node 20):
-
-```
+```sh
+# from a clone of this branch
+patch -p1 < patches/0001-batch-placements-index.patch
+# then apply the test additions in patches/0002-batch-placements-tests.patch
 node --test tests/utm-builder.test.js
-# 20 passed
 ```
 
-The complete `index.html` and `tests/utm-builder.test.js` live in the Daily Builder workspace as:
+Local verification (Node 20, 2026-09-02):
 
-- `/home/workdir/artifacts/utm-index.html` (25,210 bytes)
-- `/home/workdir/artifacts/utm-builder.test.js` (20,129 bytes)
+```
+# 20 passed, 0 failed
+```
 
-If connector payload limits block those two files, copy them onto this branch from a machine with git credentials.
+Security preserved:
 
-Do not merge until both files are present and CI is green.
+- `loadHistory()` still keeps only `http(s)` URLs
+- no `innerHTML` for generated URLs
+- no `window.lastBatch` (module-scoped `lastBatch`)
+- no network calls
+- batch CSV uses `csvSafe`
