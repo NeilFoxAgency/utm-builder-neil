@@ -9,6 +9,7 @@
 - **100% client-side** — no servers, analytics, cookies, or third-party scripts
 - Classic UTM parameters plus optional **`utm_id`** (stable GA4 campaign identifier)
 - Placement-oriented **`utm_content`** guidance (one ID per sponsored asset)
+- Optional **batch placements**: paste up to 40 placement IDs and generate one unique `utm_content` link per asset without flooding history
 - **Persistent history** in `localStorage` (max 25 links, never leaves the device)
 - **CSV export** with spreadsheet-formula neutralization
 - Safe DOM rendering (no `innerHTML` for generated URLs)
@@ -28,6 +29,7 @@ A creator can publish more than one sponsored video. Put a unique **placement ID
 2. Enter a base URL (http/https only)
 3. Fill fields or apply a preset
 4. Generate, copy, and (optionally) export history as CSV
+5. For multi-video campaigns, open **Batch placements**, paste one placement ID per line, then generate, copy all, or export a batch CSV
 
 Sanitization:
 
@@ -41,6 +43,7 @@ Sanitization:
 - CSV cells that look like spreadsheet formulas are neutralized with a leading apostrophe
 - Generated and history links are built with DOM APIs (`textContent` + `href`), not HTML string injection
 - History entries are re-validated on load, and only `http(s)` links are ever rendered
+- Batch generation stays on-device, uses the same http(s) and CSV-safety rules, and does not write every placement into history
 - See [SECURITY.md](SECURITY.md)
 
 ## Development and tests
@@ -50,7 +53,7 @@ The tool ships as a single dependency-free HTML file — there is nothing to ins
 Requirements: Node.js 20 or newer.
 
 ```sh
-node --test tests/
+node --test tests/utm-builder.test.js
 # or
 npm test
 ```
