@@ -13,6 +13,7 @@
 - **CSV export** with spreadsheet-formula neutralization
 - Safe DOM rendering (no `innerHTML` for generated URLs)
 - Quick presets aligned with creator campaigns
+- Optional **batch placements**: paste up to 40 placement IDs and generate one unique `utm_content` link per asset
 - Accessibility: skip link, focus-visible outlines, live status region, reduced-motion, dark mode
 - Works offline after the page loads
 
@@ -28,6 +29,7 @@ A creator can publish more than one sponsored video. Put a unique **placement ID
 2. Enter a base URL (http/https only)
 3. Fill fields or apply a preset
 4. Generate, copy, and (optionally) export history as CSV
+5. For multi-video campaigns, open **Batch placements**, paste one placement ID per line, then generate, copy all, or export a batch CSV
 
 Sanitization:
 
@@ -41,6 +43,7 @@ Sanitization:
 - CSV cells that look like spreadsheet formulas are neutralized with a leading apostrophe
 - Generated and history links are built with DOM APIs (`textContent` + `href`), not HTML string injection
 - History entries are re-validated on load, and only `http(s)` links are ever rendered
+- Batch generation stays on-device and does not write every placement into history
 - See [SECURITY.md](SECURITY.md)
 
 ## Development and tests
