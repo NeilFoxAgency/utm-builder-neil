@@ -66,3 +66,11 @@ MIT
 ## Contributing
 
 Open issues or pull requests for additional presets, batch paste helpers, or other campaign UX improvements. Prefer one coherent change per PR.
+
+## Governed agency batches
+
+Open [batch.html](batch.html) locally or on the deployed Pages site. It prepares one draft connector request per placement, including multiple placements by the same creator. It preserves stable IDs, enforces exact approved hosts and HTTPS, rejects UTM collisions and duplicate placements, and never invents discount codes.
+
+Download the intake for `python -m creator_link_kit.agency intake.json --output plan.json` to obtain audited, fingerprinted specifications. Downloaded browser requests are drafts, not provisioned links. Refresh Supabase records and approvals before executing them through the private attribution connector. There are no network calls or browser-history writes in this batch page. Editing or invalidating input clears prior output and disables export.
+
+Run `npm test` (Node 22+) for both the original single-link tests and batch regressions. Pages deployment now waits for tests and uploads only site assets, not the entire repository.
