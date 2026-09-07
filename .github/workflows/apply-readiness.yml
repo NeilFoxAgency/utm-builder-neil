@@ -14,7 +14,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify exact payload and apply only named source files
+      - name: Verify and apply source (workflows updated separately by maintainer)
         run: |
           python3 - <<'PY'
           import base64, hashlib, json, subprocess, zlib
@@ -38,15 +38,16 @@ jobs:
           for name, content in payload['new_files'].items():
               Path(name).parent.mkdir(parents=True, exist_ok=True)
               Path(name).write_text(content, encoding='utf-8')
+          subprocess.run(['git','restore','.github/workflows/deploy.yml','.github/workflows/readiness.yml'], check=True)
           PY
       - run: npm test
-      - name: Commit implementation and remove one-time application mechanism
+      - name: Commit source and remove one-time application mechanism
         run: |
           git config user.name 'Tracking readiness'
           git config user.email '166657561+NeilFoxAgency@users.noreply.github.com'
-          git add .github/workflows/deploy.yml .github/workflows/readiness.yml README.md batch-tools.js batch-ui.js batch.html package.json tests/batch.test.js
+          git add README.md batch-tools.js batch-ui.js batch.html package.json tests/batch.test.js
           git rm readiness-upload.b64 .github/workflows/apply-readiness.yml
-          git commit -m 'feat: add governed offline placement batch builder and tested Pages delivery'
+          git commit -m 'feat: add governed offline placement batch builder'
           git push origin HEAD:readiness/2026-09-06-tracking
           git rev-parse HEAD
       - name: Export exact committed source
