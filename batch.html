@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'unsafe-inline'; connect-src 'none'; img-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Placement link preparation | Neil Fox Agency</title>
+<style>
+:root{color-scheme:light dark;font-family:system-ui,sans-serif;line-height:1.6}body{max-width:960px;margin:3rem auto;padding:0 1.5rem}h1{line-height:1.2}textarea{box-sizing:border-box;width:100%;min-height:25rem;font:0.9rem/1.5 monospace;padding:1rem;border:1px solid #888;border-radius:6px}button{font:inherit;padding:.6rem 1rem;margin:.4rem .4rem .4rem 0;cursor:pointer}button:disabled{cursor:default}pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:1rem;border:1px solid #888;border-radius:6px}a:focus-visible,button:focus-visible,textarea:focus-visible{outline:3px solid #087fb6;outline-offset:3px}.note{border-left:4px solid #888;padding-left:1rem}label{display:block;font-weight:600;margin:1.5rem 0 .5rem}
+</style>
+<script src="batch-tools.js" defer></script><script src="batch-ui.js" defer></script>
+</head>
+<body>
+<a href="index.html">Single-link builder</a>
+<h1>Prepare placement tracking links</h1>
+<p>One request per sponsored video, including multiple videos from the same creator. This page runs locally in your browser. It does not send data, store history, shorten links, or measure clicks.</p>
+<p class="note"><strong>Preparation is not publication.</strong> Use existing campaign and placement IDs, a current Supabase snapshot version, and explicitly approved destination hosts. Your Operations Agent must recheck those records before creating live delivery links. The example below is synthetic.</p>
+<label for="intake">Campaign intake JSON</label>
+<textarea id="intake" spellcheck="false" aria-describedby="help">{
+  "source_system": "supabase",
+  "supabase_snapshot_version": "replace-with-current-record-version",
+  "brand_id": "brand-demo",
+  "campaign_id": "cmp-demo",
+  "approved_domains": ["shop.example.com"],
+  "placements": [
+    {
+      "creator_id": "creator-demo",
+      "placement_id": "plc-demo-video-1",
+      "destination_url": "https://shop.example.com/product"
+    },
+    {
+      "creator_id": "creator-demo",
+      "placement_id": "plc-demo-video-2",
+      "destination_url": "https://shop.example.com/product"
+    }
+  ]
+}</textarea>
+<p id="help">Optional placement fields: <code>discount_code</code> and <code>slug</code>. Use only values already approved; the tool never invents a redeemable code. Existing UTM parameters, duplicate placement IDs, and unapproved hosts are rejected.</p>
+<button id="prepare" type="button">Prepare draft requests</button>
+<button id="export-intake" type="button" disabled>Download intake for CLI</button>
+<button id="download" type="button" disabled>Download requests</button>
+<button id="copy" type="button" disabled>Copy requests</button>
+<p id="status" role="status" aria-live="polite"></p>
+<h2>Draft output</h2><pre id="result" tabindex="0" aria-label="Draft request output"></pre>
+<p>For audited specifications and deterministic fingerprints, run the downloaded intake through <code>python -m creator_link_kit.agency campaign-intake.json --output plan.json</code>. This is link preparation, not a report of campaign results.</p>
+</body>
+</html>
