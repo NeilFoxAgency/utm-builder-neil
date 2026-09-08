@@ -12,6 +12,7 @@
 - **Persistent history** in `localStorage` (max 25 links, never leaves the device)
 - **CSV export** with spreadsheet-formula neutralization
 - Safe DOM rendering (no `innerHTML` for generated URLs)
+- **Inspect existing URLs** — paste a shipped creator, bio, or ad link to refill the form and surface common shipping defects
 - Quick presets aligned with creator campaigns
 - Accessibility: skip link, focus-visible outlines, live status region, reduced-motion, dark mode
 - Works offline after the page loads
@@ -26,7 +27,7 @@ A creator can publish more than one sponsored video. Put a unique **placement ID
 
 1. Open the live site or clone and open `index.html` in a browser
 2. Enter a base URL (http/https only)
-3. Fill fields or apply a preset
+3. Fill fields, apply a preset, or paste an existing URL into **Inspect an existing campaign URL**
 4. Generate, copy, and (optionally) export history as CSV
 
 Sanitization:
@@ -41,6 +42,7 @@ Sanitization:
 - CSV cells that look like spreadsheet formulas are neutralized with a leading apostrophe
 - Generated and history links are built with DOM APIs (`textContent` + `href`), not HTML string injection
 - History entries are re-validated on load, and only `http(s)` links are ever rendered
+- Inspected URLs are parsed only in the browser; javascript/data/file schemes are rejected
 - See [SECURITY.md](SECURITY.md)
 
 ## Development and tests
