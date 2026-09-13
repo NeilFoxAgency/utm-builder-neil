@@ -15,6 +15,7 @@
 - Quick presets aligned with creator campaigns
 - Accessibility: skip link, focus-visible outlines, live status region, reduced-motion, dark mode
 - Works offline after the page loads
+- **Inspect a shipped URL** (`inspect.html`) — parse UTMs already in a description, bio, or ad without fetching the destination
 
 ## Why `utm_id` and placement IDs
 
@@ -28,6 +29,7 @@ A creator can publish more than one sponsored video. Put a unique **placement ID
 2. Enter a base URL (http/https only)
 3. Fill fields or apply a preset
 4. Generate, copy, and (optionally) export history as CSV
+5. Or open `inspect.html` and paste a URL that already shipped to recover fields and surface HTTP, fragment-UTM, encoded-`&`, and missing-field warnings
 
 Sanitization:
 
@@ -73,4 +75,6 @@ Open [batch.html](batch.html) locally or on the deployed Pages site. It prepares
 
 Download the intake for `python -m creator_link_kit.agency intake.json --output plan.json` to obtain audited, fingerprinted specifications. Downloaded browser requests are drafts, not provisioned links. Refresh Supabase records and approvals before executing them through the private attribution connector. There are no network calls or browser-history writes in this batch page. Editing or invalidating input clears prior output and disables export.
 
-Run `npm test` (Node 22+) for both the original single-link tests and batch regressions. Pages deployment now waits for tests and uploads only site assets, not the entire repository.
+Open [inspect.html](inspect.html) to review a URL that already shipped. Inspect stays client-side, writes no history, and does not fetch the destination.
+
+Run `npm test` (Node 22+) for the original single-link tests, batch regressions, and inspect regressions. Pages deployment waits for tests and uploads only site assets.
