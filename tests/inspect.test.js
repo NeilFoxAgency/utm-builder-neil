@@ -92,3 +92,31 @@ test('UI uses textContent and inspect-url.js; no network or injection', () => {
   assert.match(html, /connect-src 'none'/);
   assert.doesNotMatch(html, /<script[^>]+src=["']https?:/);
 });
+
+test('clean, fully tagged URLs produce no warnings', () => {
+  const report = inspectExistingUrl(
+    'https://shop.example.com/product?utm_source=youtube&utm_medium=creator_sponsorship&utm_campaign=spring_launch&utm_id=CMP-1&utm_content=plc-greta-video-01'
+  );
+  assert.equal(report.ok, true);
+  assert.deepEqual(report.warnings, []);
+});
+
+test('extra-? warning fires on a real second delimiter, not on every query', () => {
+  const glued = inspectExistingUrl('https://shop.example.com/p?a=1?utm_source=youtube');
+  assert.ok(glued.warnings.some((w) => /Extra \?/i.test(w)));
+  const normal = inspectExistingUrl('https://shop.example.com/p?utm_source=youtube&utm_medium=creator&utm_campaign=spring&utm_id=C1&utm_content=p1');
+  assert.ok(!normal.warnings.some((w) => /Extra \?/i.test(w)));
+});
+
+test('trailing paste whitespace is ignored; interior whitespace still warns', () => {
+  const trailing = inspectExistingUrl('https://shop.example.com/p?utm_source=youtube&utm_medium=creator&utm_campaign=spring&utm_id=C1&utm_content=p1\n');
+  assert.ok(!trailing.warnings.some((w) => /hitespace/i.test(w)));
+  const interior = inspectExistingUrl('https://shop.example.com/p?utm_source=youtube utm_medium=creator');
+  assert.ok(interior.warnings.some((w) => /hitespace/i.test(w)));
+});
+
+test('warns when credentials are embedded in the URL', () => {
+  const report = inspectExistingUrl('https://user:secret@shop.example.com/p?utm_source=youtube&utm_medium=creator&utm_campaign=spring&utm_id=C1&utm_content=p1');
+  assert.equal(report.ok, true);
+  assert.ok(report.warnings.some((w) => /redentials/i.test(w)));
+});

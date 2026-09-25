@@ -14,7 +14,9 @@
     if (!text) {
       return { ok: false, error: 'Paste an absolute http(s) URL.', warnings: warnings };
     }
-    if (/\s/.test(raw)) warnings.push('Whitespace in the paste can hide extra query pieces.');
+    // Interior whitespace only: trim() already removed harmless leading/trailing
+    // paste artifacts, so anything left can merge or hide query pairs.
+    if (/\s/.test(text)) warnings.push('Whitespace inside the URL can hide or merge query pieces.');
     if (/https?:\/\/https?:\/\//i.test(text)) {
       return { ok: false, error: 'Doubled http(s) scheme. The destination is not a valid URL.', warnings: warnings };
     }
@@ -34,7 +36,12 @@
       return { ok: false, error: 'Only http and https URLs are allowed.', warnings: warnings };
     }
     if (url.protocol === 'http:') warnings.push('HTTP destination. Prefer HTTPS before the link ships.');
-    if ((url.search.match(/\?/g) || []).length) {
+    if (url.username || url.password) {
+      warnings.push('Credentials are embedded in the URL. Remove them before the link ships.');
+    }
+    // url.search begins with the leading '?', so count only later ones;
+    // otherwise every URL with any query string would warn.
+    if (url.search.slice(1).includes('?')) {
       warnings.push('Extra ? in the query. Later pairs may be ignored by GA4.');
     }
     if (/%26utm_/i.test(url.search) || /%26utm_/i.test(text)) {
