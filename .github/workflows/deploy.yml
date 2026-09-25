@@ -34,7 +34,7 @@ jobs:
       - name: Stage only public site assets
         run: |
           mkdir _site
-          cp index.html batch.html batch-tools.js batch-ui.js _site/
+          cp index.html batch.html batch-tools.js batch-ui.js inspect.html inspect-url.js inspect-ui.js _site/
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
